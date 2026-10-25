@@ -58,7 +58,18 @@ class LoginIn(BaseModel):
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "time": str(mt.now_ist())}
+    return {"ok": True, "time": str(mt.now_ist()), "needs_setup": auth.needs_setup()}
+
+
+@app.post("/api/auth/setup")
+def first_setup(body: LoginIn):
+    """First visit only: the owner chooses the password (works once, while no password exists)."""
+    if not auth.needs_setup():
+        bad("Password already set - log in instead", 409)
+    if len(body.password) < 10:
+        bad("Use at least 10 characters")
+    auth.set_password(body.password)
+    return {"token": auth.make_token()}
 
 
 @app.post("/api/auth/login")

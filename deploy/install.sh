@@ -42,7 +42,6 @@ if [ ! -f "$ENVF" ]; then
   cat > "$ENVF" <<ENV
 TM_DATA_DIR=/var/lib/trademaster
 TM_SECRET_KEY=$(head -c 32 /dev/urandom | base64 | tr -d '=+/')
-TM_OWNER_PASSWORD=${TM_OWNER_PASSWORD:-$(head -c 12 /dev/urandom | base64 | tr -d '=+/')}
 TM_ALLOW_LIVE=1
 TM_CORS_ORIGINS=http://localhost:5173
 ENV

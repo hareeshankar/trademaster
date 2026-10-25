@@ -39,6 +39,10 @@ def ensure_owner():
     os.chmod(OWNER_FILE, 0o600)
 
 
+def needs_setup():
+    return not os.path.exists(OWNER_FILE)
+
+
 def set_password(new_pw):
     salt = os.urandom(16)
     with open(OWNER_FILE, "w") as f:

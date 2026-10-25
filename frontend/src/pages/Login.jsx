@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, token } from "../api.js";
 
 export default function Login({ onDone }) {
   const [pw, setPw] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const [setup, setSetup] = useState(false);
+  const [pw2, setPw2] = useState("");
+
+  useEffect(() => { api("/api/health").then((h) => setSetup(!!h.needs_setup)).catch(() => {}); }, []);
 
   const go = async (e) => {
     e.preventDefault();
     setBusy(true);
     setErr("");
     try {
-      const r = await api("/api/auth/login", { method: "POST", body: { password: pw } });
+      if (setup && pw !== pw2) throw new Error("The two passwords don't match");
+      const r = await api(setup ? "/api/auth/setup" : "/api/auth/login", { method: "POST", body: { password: pw } });
       token.set(r.token);
       onDone();
     } catch (ex) {
@@ -29,13 +34,19 @@ export default function Login({ onDone }) {
           <rect x="13" y="5" width="5" height="7" className="r" /><rect x="15" y="2" width="1" height="13" className="r" />
         </svg>
         <h1>TradeMaster</h1>
-        <p className="muted">Pattern trading on your Angel One account.</p>
+        <p className="muted">{setup ? "First visit: choose the password that protects this app." : "Pattern trading on your Angel One account."}</p>
         <label className="field">
-          <span>Owner password</span>
-          <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoFocus autoComplete="current-password" />
+          <span>{setup ? "New password (at least 10 characters)" : "Owner password"}</span>
+          <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoFocus autoComplete={setup ? "new-password" : "current-password"} />
         </label>
+        {setup && (
+          <label className="field">
+            <span>Type it again</span>
+            <input type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} autoComplete="new-password" />
+          </label>
+        )}
         {err && <p className="err">{err}</p>}
-        <button className="primary wide" disabled={busy || !pw}>{busy ? "Checking..." : "Log in"}</button>
+        <button className="primary wide" disabled={busy || !pw || (setup && pw.length < 10)}>{busy ? "Checking..." : setup ? "Set password and enter" : "Log in"}</button>
       </form>
     </div>
   );
