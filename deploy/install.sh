@@ -87,6 +87,9 @@ echo '*/5 * * * * root /usr/local/bin/trademaster-https' > /etc/cron.d/trademast
 echo ">> nightly backup of strategies + trades (keeps 14 days)"
 echo '30 23 * * * root tar -czf /var/backups/trademaster-$(date +\%F).tgz -C /var/lib trademaster && find /var/backups -name "trademaster-*.tgz" -mtime +14 -delete' > /etc/cron.d/trademaster-backup
 
+echo ">> pick up new versions every morning before the market opens (only if new code was pushed)"
+echo '30 8 * * 1-5 root bash /opt/trademaster/deploy/update.sh >> /var/log/trademaster-update.log 2>&1' > /etc/cron.d/trademaster-update
+
 systemctl daemon-reload
 systemctl enable --now trademaster caddy
 systemctl restart trademaster
