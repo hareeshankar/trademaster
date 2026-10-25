@@ -31,7 +31,7 @@ echo ">> clock: India time"
 timedatectl set-timezone Asia/Kolkata || true
 
 echo ">> app"
-git config --global --add safe.directory /opt/trademaster
+git config --system --add safe.directory /opt/trademaster
 id trademaster >/dev/null 2>&1 || useradd --system --create-home --shell /usr/sbin/nologin trademaster
 if [ -d "$APP/.git" ]; then git -C "$APP" pull --ff-only; else git clone --depth 1 "$REPO" "$APP"; fi
 python3 -m venv "$APP/backend/.venv"

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Pull the latest TradeMaster code and restart (run on the server: sudo bash /opt/trademaster/deploy/update.sh)
 set -e
-git config --global --add safe.directory /opt/trademaster 2>/dev/null || true   # repo is owned by the app user
+git config --system --add safe.directory /opt/trademaster 2>/dev/null || true   # repo is owned by the app user
 # keep the auto-deploy schedule current (every 2 minutes)
 echo '*/2 * * * * root flock -n /run/tm-update.lock bash /opt/trademaster/deploy/update.sh >> /var/log/trademaster-update.log 2>&1' > /etc/cron.d/trademaster-update
 OLD=$(git -C /opt/trademaster rev-parse HEAD)
