@@ -1,6 +1,7 @@
 #!/bin/bash
 # Pull the latest TradeMaster code and restart (run on the server: sudo bash /opt/trademaster/deploy/update.sh)
 set -e
+git config --global --add safe.directory /opt/trademaster 2>/dev/null || true   # repo is owned by the app user
 OLD=$(git -C /opt/trademaster rev-parse HEAD)
 git -C /opt/trademaster pull --ff-only
 [ "$OLD" = "$(git -C /opt/trademaster rev-parse HEAD)" ] && [ "${1:-}" != "--force" ] && { echo "already up to date"; exit 0; }

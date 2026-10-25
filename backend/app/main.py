@@ -22,6 +22,7 @@ from .models import EXCHANGES, TIMEFRAMES, Config
 from .patterns import PATTERN_DEFS, PATTERNS, classify_candles, excel_check_rows
 from .settings import ALLOW_LIVE, CORS_ORIGINS
 from . import storage
+from . import seed
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 app = FastAPI(title="TradeMaster", docs_url=None, redoc_url=None)
@@ -32,6 +33,7 @@ app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_methods=["*
 def _startup():
     auth.ensure_owner()
     threading.Thread(target=BROKER.auto_login, daemon=True).start()
+    seed.seed_in_background()
 
 
 def need_owner(authorization: str = Header(default="")):
